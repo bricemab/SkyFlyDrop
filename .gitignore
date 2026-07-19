@@ -2,6 +2,9 @@ node_modules/
 dist/
 .env
 data/*.json
+data/*.db
+data/*.db-shm
+data/*.db-wal
 
 # secrets / clés — NE JAMAIS committer
 bricemab_*

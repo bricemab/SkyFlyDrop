@@ -28,6 +28,8 @@ export const config = {
   scanEveryHours: Math.max(1, Number(optional("SCAN_EVERY_HOURS", "6"))),
   discountThreshold: Number(optional("DISCOUNT_THRESHOLD", "0.35")),
   minHistory: Math.max(1, Number(optional("MIN_HISTORY", "5"))),
+  resendApiKey: (process.env.RESEND_API_KEY ?? "").trim(),
+  emailFrom: optional("EMAIL_FROM", "SkyFlyDrop <onboarding@resend.dev>"),
 } as const;
 
 /** Sans token Telegram -> on n'envoie rien, on logue (mode test). */
