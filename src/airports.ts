@@ -4,6 +4,7 @@ interface NamedRaw {
   code?: string;
   name?: string | null;
   city_code?: string | null;
+  country_code?: string | null;
   name_translations?: { fr?: string; en?: string };
 }
 
@@ -14,6 +15,7 @@ function bestName(r: NamedRaw): string | undefined {
 
 const LANGS = ["fr", "en"] as const;
 const labels = new Map<string, string>();
+const countries = new Map<string, string>();
 let loaded = false;
 
 /** Charge cities/airports depuis le cache local, sinon depuis Travelpayouts (fr puis en). */
@@ -48,6 +50,7 @@ export async function ensureCatalog(): Promise<void> {
     for (const c of cities) {
       const n = bestName(c);
       if (c.code !== undefined && n !== undefined) cityName.set(c.code, n);
+      if (c.code !== undefined && c.country_code) countries.set(c.code, c.country_code);
     }
 
     const airports = await loadFile("airports");
@@ -56,6 +59,7 @@ export async function ensureCatalog(): Promise<void> {
       const viaCity = a.city_code ? cityName.get(a.city_code) : undefined;
       const label = viaCity ?? bestName(a);
       if (label !== undefined) labels.set(a.code, label);
+      if (a.country_code) countries.set(a.code, a.country_code);
     }
 
     // certains codes sont directement des codes de ville (GVA, PAR...)
@@ -73,4 +77,17 @@ export async function ensureCatalog(): Promise<void> {
 /** Nom de ville pour un code IATA, ou le code lui-même en repli. */
 export function cityName(iata: string): string {
   return labels.get(iata) ?? iata;
+}
+
+/** Emoji drapeau depuis un code pays ISO 2 lettres (ex. "TR" -> 🇹🇷). */
+function flag(cc: string): string {
+  if (cc.length !== 2) return "";
+  const base = 0x1f1e6 - "A".charCodeAt(0);
+  return [...cc.toUpperCase()].map((c) => String.fromCodePoint(base + c.charCodeAt(0))).join("");
+}
+
+/** Drapeau du pays d'un code IATA (vide si inconnu). */
+export function countryFlag(iata: string): string {
+  const cc = countries.get(iata);
+  return cc !== undefined ? flag(cc) : "";
 }

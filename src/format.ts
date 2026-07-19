@@ -1,5 +1,5 @@
 import type { Deal, Region } from "./types.js";
-import { cityName } from "./airports.js";
+import { cityName, countryFlag } from "./airports.js";
 
 const REGION_EMOJI: Record<Region, string> = {
   europe: "🇪🇺",
@@ -23,13 +23,22 @@ function fmtDate(iso: string): string {
   });
 }
 
+function tripNights(d: Deal): number | null {
+  if (d.returnAt === null) return null;
+  const ms = new Date(d.returnAt).getTime() - new Date(d.departureAt).getTime();
+  const nights = Math.round(ms / 86_400_000);
+  return nights > 0 ? nights : null;
+}
+
 /** Message HTML prêt pour l'API Telegram. */
 export function formatDeal(d: Deal): string {
-  const emoji = REGION_EMOJI[d.region];
+  const flag = countryFlag(d.destination) || REGION_EMOJI[d.region];
   const price = `${Math.round(d.price)} ${d.currency.toUpperCase()}`;
   const trip = d.returnAt !== null ? "aller-retour" : "aller simple";
   const stops =
     d.transfers === 0 ? "direct" : `${d.transfers} escale${d.transfers > 1 ? "s" : ""}`;
+  const nights = tripNights(d);
+  const nightsTxt = nights !== null ? ` · ${nights} nuit${nights > 1 ? "s" : ""}` : "";
   const dates =
     d.returnAt !== null
       ? `${fmtDate(d.departureAt)} → ${fmtDate(d.returnAt)}`
@@ -38,9 +47,9 @@ export function formatDeal(d: Deal): string {
     d.discountPct !== null ? ` <b>(−${Math.round(d.discountPct * 100)}%)</b>` : "";
 
   return [
-    `${emoji} <b>${cityName(d.origin)} (${d.origin}) → ${cityName(d.destination)} (${d.destination})</b>`,
+    `${flag} <b>${cityName(d.origin)} (${d.origin}) → ${cityName(d.destination)} (${d.destination})</b>`,
     ``,
-    `💸 <b>${price}</b>${disc} · ${trip} · ${stops}`,
+    `💸 <b>${price}</b>${disc} · ${trip} · ${stops}${nightsTxt}`,
     `📅 ${dates}`,
     `✈️ ${d.airline}`,
     ``,

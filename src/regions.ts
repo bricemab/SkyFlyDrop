@@ -64,16 +64,16 @@ const IATA_REGION: Record<string, Region> = {
 
 /** Plafond "bon prix" par région (économie, CHF). Cold-start : déclenche sans historique. */
 const REGION_MAX_ECONOMY: Record<Region, number> = {
-  europe: 39,
-  north_africa: 79,
-  middle_east: 199,
-  asia: 349,
-  indian_ocean: 449,
-  north_america: 299,
-  south_america: 499,
-  africa: 399,
-  oceania: 699,
-  unknown: 199,
+  europe: 29,
+  north_africa: 65,
+  middle_east: 149,
+  asia: 299,
+  indian_ocean: 399,
+  north_america: 249,
+  south_america: 449,
+  africa: 349,
+  oceania: 599,
+  unknown: 99,
 };
 
 export function regionOf(iata: string): Region {
