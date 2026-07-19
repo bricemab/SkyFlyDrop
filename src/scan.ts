@@ -1,3 +1,4 @@
+import { setTimeout as sleep } from "node:timers/promises";
 import { config } from "./config.js";
 import { cityDirections } from "./travelpayouts.js";
 import { evaluate, dealKey, routeKey } from "./deals.js";
@@ -31,9 +32,14 @@ export async function runScan(): Promise<void> {
       const key = dealKey(e);
       if (await isSeen(key)) continue;
 
-      await postMessage(formatDeal(deal));
-      await markSeen(key);
-      posted++;
+      try {
+        await postMessage(formatDeal(deal));
+        await markSeen(key);
+        posted++;
+        await sleep(1200); // throttle Telegram (~1 msg/s par canal)
+      } catch (err) {
+        console.error(`  post échoué ${key}:`, err instanceof Error ? err.message : err);
+      }
     }
   }
 
