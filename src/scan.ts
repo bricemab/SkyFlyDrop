@@ -5,10 +5,12 @@ import { evaluate, dealKey, routeKey } from "./deals.js";
 import { recordPrice, isSeen, markSeen } from "./store.js";
 import { formatDeal } from "./format.js";
 import { postMessage } from "./telegram.js";
+import { ensureCatalog } from "./airports.js";
 import type { PriceEntry } from "./types.js";
 
 export async function runScan(): Promise<void> {
   console.log(`[${new Date().toISOString()}] scan · origines=${config.origins.join(",")}`);
+  await ensureCatalog();
   let candidates = 0;
   let posted = 0;
 

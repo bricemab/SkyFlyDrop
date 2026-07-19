@@ -1,4 +1,5 @@
 import type { Deal, Region } from "./types.js";
+import { cityName } from "./airports.js";
 
 const REGION_EMOJI: Record<Region, string> = {
   europe: "🇪🇺",
@@ -37,7 +38,7 @@ export function formatDeal(d: Deal): string {
     d.discountPct !== null ? ` <b>(−${Math.round(d.discountPct * 100)}%)</b>` : "";
 
   return [
-    `${emoji} <b>${d.origin} → ${d.destination}</b>`,
+    `${emoji} <b>${cityName(d.origin)} (${d.origin}) → ${cityName(d.destination)} (${d.destination})</b>`,
     ``,
     `💸 <b>${price}</b>${disc} · ${trip} · ${stops}`,
     `📅 ${dates}`,
