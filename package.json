@@ -8,6 +8,8 @@
     "scan": "tsx src/index.ts --once",
     "start": "tsx src/index.ts",
     "dev": "tsx watch src/index.ts --once",
+    "build": "tsc",
+    "start:prod": "node dist/index.js",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
