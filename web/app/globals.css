@@ -1,5 +1,18 @@
 @import "tailwindcss";
 
+@theme {
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-grotesk);
+}
+
 :root {
   color-scheme: dark;
+}
+
+body {
+  background-color: #070a12;
+}
+
+.tnum {
+  font-variant-numeric: tabular-nums;
 }

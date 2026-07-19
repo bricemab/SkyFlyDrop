@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Plane, CalendarDays, ArrowRight, Bell, MapPin } from "lucide-react";
 import { getDeals } from "@/lib/db";
 import { dealImage } from "@/lib/images";
 
@@ -17,40 +18,50 @@ export default function Home() {
 
   return (
     <div>
-      <header className="flex items-center justify-between px-6 py-4">
-        <span className="text-lg font-bold">✈️ SkyFlyDrop</span>
-        <Link
-          href="/alerts"
-          className="rounded-full bg-sky-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-sky-400"
-        >
-          Créer une alerte
-        </Link>
-      </header>
-
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-sky-600 via-indigo-700 to-slate-900" />
-        <div className="relative mx-auto max-w-4xl px-6 py-20 text-center">
-          <h1 className="text-4xl font-extrabold tracking-tight sm:text-6xl">
-            Envole-toi pour moins cher.
-          </h1>
-          <p className="mx-auto mt-4 max-w-xl text-lg text-sky-100">
-            Les meilleurs prix de vols au départ de <b>Genève, Zurich &amp; Bâle</b>, mis à jour
-            en continu.
-          </p>
+      <header className="sticky top-0 z-20 border-b border-white/5 bg-[#070a12]/70 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+          <span className="flex items-center gap-2 font-display text-lg font-bold">
+            <Plane className="h-5 w-5 text-cyan-400" /> SkyFlyDrop
+          </span>
           <Link
             href="/alerts"
-            className="mt-8 inline-block rounded-full bg-white px-8 py-3 font-semibold text-slate-900 shadow-lg transition hover:bg-sky-50"
+            className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white backdrop-blur transition hover:border-cyan-400/50 hover:bg-white/10"
           >
-            Recevoir les deals par email →
+            <Bell className="h-4 w-4 text-cyan-400" /> Créer une alerte
           </Link>
         </div>
+      </header>
+
+      <section className="mx-auto max-w-4xl px-6 pb-16 pt-20 text-center">
+        <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-xs font-medium text-white/70 backdrop-blur">
+          <span className="h-1.5 w-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.9)]" />
+          Départs Genève · Zurich · Bâle
+        </span>
+        <h1 className="mt-6 font-display text-5xl font-bold leading-[1.05] tracking-tight sm:text-7xl">
+          Envole-toi{" "}
+          <span className="bg-gradient-to-r from-cyan-300 via-sky-300 to-violet-300 bg-clip-text text-transparent">
+            pour moins cher.
+          </span>
+        </h1>
+        <p className="mx-auto mt-5 max-w-xl text-lg text-white/60">
+          Les meilleurs prix de vols au départ de Suisse, mis à jour en continu. Reçois-les
+          selon tes critères.
+        </p>
+        <Link
+          href="/alerts"
+          className="mt-9 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-cyan-400 to-violet-500 px-8 py-3.5 font-semibold text-slate-950 shadow-[0_0_40px_-5px_rgba(34,211,238,0.55)] transition hover:brightness-110"
+        >
+          Recevoir les deals par email <ArrowRight className="h-4 w-4" />
+        </Link>
       </section>
 
-      <section className="mx-auto max-w-6xl px-6 py-14">
-        <h2 className="mb-6 text-2xl font-bold">🔥 Les deals du moment</h2>
+      <section className="mx-auto max-w-6xl px-6 pb-16">
+        <h2 className="mb-6 font-display text-2xl font-bold">Les deals du moment</h2>
 
         {deals.length === 0 ? (
-          <p className="text-neutral-400">Les deals arrivent… reviens dans quelques minutes.</p>
+          <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-10 text-center text-white/50 backdrop-blur-xl">
+            Les deals arrivent… reviens dans quelques minutes.
+          </div>
         ) : (
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {deals.map((d) => (
@@ -59,36 +70,38 @@ export default function Home() {
                 href={d.affiliateUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group overflow-hidden rounded-2xl border border-neutral-800 bg-neutral-900 transition hover:border-neutral-600"
+                className="group relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04] backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:border-white/20 hover:shadow-[0_20px_60px_-15px_rgba(34,211,238,0.25)]"
               >
                 <div className="relative aspect-[4/3] overflow-hidden">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={dealImage(d.destinationName, d.destination)}
-                    alt={d.destinationName}
-                    className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                    alt={`Vol vers ${d.destinationName}`}
+                    className="h-full w-full object-cover opacity-90 transition duration-500 group-hover:scale-105 group-hover:opacity-100"
                     loading="lazy"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
-                  <div className="absolute right-3 top-3 rounded-full bg-sky-500 px-3 py-1 text-sm font-bold text-white shadow">
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#070a12] via-[#070a12]/30 to-transparent" />
+                  <div className="tnum absolute right-3 top-3 rounded-full bg-gradient-to-r from-cyan-400 to-violet-500 px-3 py-1 text-sm font-bold text-slate-950 shadow-[0_0_20px_rgba(34,211,238,0.35)]">
                     {Math.round(d.price)} {d.currency.toUpperCase()}
                   </div>
-                  <div className="absolute bottom-3 left-4 right-4">
-                    <div className="text-xl font-bold leading-tight">{d.destinationName}</div>
-                    <div className="text-xs text-white/70">
-                      depuis {d.originName} ({d.origin})
+                  <div className="absolute inset-x-4 bottom-3">
+                    <div className="font-display text-2xl font-bold leading-tight">
+                      {d.destinationName}
+                    </div>
+                    <div className="mt-0.5 flex items-center gap-1.5 text-xs text-white/60">
+                      <MapPin className="h-3 w-3" /> depuis {d.originName} ({d.origin})
                     </div>
                   </div>
                 </div>
-                <div className="flex items-center justify-between px-4 py-3 text-sm text-neutral-400">
-                  <span>
-                    📅 {fmtDate(d.departureAt)}
-                    {d.returnAt !== null ? ` – ${fmtDate(d.returnAt)}` : ""}
+                <div className="flex items-center justify-between px-4 py-3 text-sm text-white/60">
+                  <span className="flex items-center gap-1.5">
+                    <CalendarDays className="h-4 w-4" />
+                    {fmtDate(d.departureAt)}
+                    {d.returnAt !== null ? `–${fmtDate(d.returnAt)}` : ""}
                   </span>
-                  <span>
-                    {d.transfers === 0
-                      ? "Direct"
-                      : `${d.transfers} escale${d.transfers > 1 ? "s" : ""}`}
+                  <span className="flex items-center gap-1.5">
+                    <Plane className="h-4 w-4" />
+                    {d.transfers === 0 ? "Direct" : `${d.transfers} esc.`}
                   </span>
                 </div>
               </a>
@@ -97,22 +110,26 @@ export default function Home() {
         )}
       </section>
 
-      <section className="mx-auto mb-16 max-w-4xl px-6">
-        <div className="rounded-3xl bg-gradient-to-r from-sky-600 to-indigo-600 px-8 py-10 text-center">
-          <h3 className="text-2xl font-bold">Ne rate plus jamais un bon plan</h3>
-          <p className="mt-2 text-sky-100">
-            Choisis tes critères, on t&apos;alerte dès qu&apos;un deal tombe.
-          </p>
-          <Link
-            href="/alerts"
-            className="mt-6 inline-block rounded-full bg-white px-8 py-3 font-semibold text-slate-900 transition hover:bg-sky-50"
-          >
-            Créer mon alerte gratuite
-          </Link>
+      <section className="mx-auto mb-20 max-w-4xl px-6">
+        <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.04] p-10 text-center backdrop-blur-xl">
+          <div className="pointer-events-none absolute -left-20 -top-20 h-60 w-60 rounded-full bg-cyan-500/20 blur-[80px]" />
+          <div className="pointer-events-none absolute -bottom-20 -right-20 h-60 w-60 rounded-full bg-violet-500/20 blur-[80px]" />
+          <div className="relative">
+            <h3 className="font-display text-3xl font-bold">Ne rate plus jamais un bon plan</h3>
+            <p className="mx-auto mt-3 max-w-md text-white/60">
+              Choisis tes critères, on t&apos;alerte dès qu&apos;un deal tombe.
+            </p>
+            <Link
+              href="/alerts"
+              className="mt-7 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-cyan-400 to-violet-500 px-8 py-3.5 font-semibold text-slate-950 shadow-[0_0_30px_-5px_rgba(34,211,238,0.5)] transition hover:brightness-110"
+            >
+              Créer mon alerte gratuite <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
         </div>
       </section>
 
-      <footer className="pb-10 text-center text-xs text-neutral-600">
+      <footer className="border-t border-white/5 py-8 text-center text-xs text-white/40">
         SkyFlyDrop · deals de vols au départ de Suisse · prix indicatifs via Aviasales
       </footer>
     </div>
