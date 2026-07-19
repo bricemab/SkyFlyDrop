@@ -21,6 +21,22 @@ db.exec(`
     active INTEGER NOT NULL DEFAULT 1,
     created_at TEXT NOT NULL
   );
+  CREATE TABLE IF NOT EXISTS deals (
+    deal_key TEXT PRIMARY KEY,
+    origin TEXT NOT NULL,
+    destination TEXT NOT NULL,
+    origin_name TEXT NOT NULL,
+    destination_name TEXT NOT NULL,
+    price INTEGER NOT NULL,
+    currency TEXT NOT NULL,
+    airline TEXT NOT NULL,
+    transfers INTEGER NOT NULL,
+    region TEXT NOT NULL,
+    departure_at TEXT NOT NULL,
+    return_at TEXT,
+    affiliate_url TEXT NOT NULL,
+    created_at TEXT NOT NULL
+  );
 `);
 
 export interface SubscriberInput {
@@ -55,4 +71,58 @@ export function countSubscribers(): number {
     .prepare("SELECT COUNT(*) AS n FROM subscribers WHERE active = 1")
     .get() as { n: number };
   return row.n;
+}
+
+export interface DealRow {
+  origin: string;
+  destination: string;
+  originName: string;
+  destinationName: string;
+  price: number;
+  currency: string;
+  airline: string;
+  transfers: number;
+  region: string;
+  departureAt: string;
+  returnAt: string | null;
+  affiliateUrl: string;
+}
+
+interface DealDbRow {
+  origin: string;
+  destination: string;
+  origin_name: string;
+  destination_name: string;
+  price: number;
+  currency: string;
+  airline: string;
+  transfers: number;
+  region: string;
+  departure_at: string;
+  return_at: string | null;
+  affiliate_url: string;
+}
+
+export function getDeals(limit = 18): DealRow[] {
+  const rows = db
+    .prepare(
+      `SELECT origin, destination, origin_name, destination_name, price, currency, airline,
+              transfers, region, departure_at, return_at, affiliate_url
+       FROM deals ORDER BY price ASC LIMIT ?`,
+    )
+    .all(limit) as DealDbRow[];
+  return rows.map((r) => ({
+    origin: r.origin,
+    destination: r.destination,
+    originName: r.origin_name,
+    destinationName: r.destination_name,
+    price: r.price,
+    currency: r.currency,
+    airline: r.airline,
+    transfers: r.transfers,
+    region: r.region,
+    departureAt: r.departure_at,
+    returnAt: r.return_at,
+    affiliateUrl: r.affiliate_url,
+  }));
 }

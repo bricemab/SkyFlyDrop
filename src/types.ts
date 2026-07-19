@@ -31,3 +31,20 @@ export interface Deal extends PriceEntry {
   discountPct: number | null; // remise vs référence (0..1)
   affiliateUrl: string;
 }
+
+/** Deal stocké en base pour l'affichage du site (vitrine). */
+export interface DealRecord {
+  dealKey: string;
+  origin: string;
+  destination: string;
+  originName: string;
+  destinationName: string;
+  price: number;
+  currency: string;
+  airline: string;
+  transfers: number;
+  region: Region;
+  departureAt: string;
+  returnAt: string | null;
+  affiliateUrl: string;
+}

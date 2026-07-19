@@ -1,20 +1,23 @@
 import { setTimeout as sleep } from "node:timers/promises";
 import { config } from "./config.js";
 import { cityDirections } from "./travelpayouts.js";
+import { regionOf } from "./regions.js";
+import { buildFlightLink } from "./affiliate.js";
 import { evaluate, dealKey, routeKey } from "./deals.js";
 import { recordPrice, isSeen, markSeen } from "./store.js";
 import { formatDeal } from "./format.js";
 import { postMessage } from "./telegram.js";
-import { ensureCatalog } from "./airports.js";
-import { activeSubscribers, alreadySent, markSent } from "./db.js";
+import { ensureCatalog, cityName } from "./airports.js";
+import { activeSubscribers, alreadySent, markSent, replaceBrowseDeals } from "./db.js";
 import { matches } from "./match.js";
 import { sendDealEmail } from "./email.js";
-import type { PriceEntry } from "./types.js";
+import type { PriceEntry, DealRecord } from "./types.js";
 
 export async function runScan(): Promise<void> {
   console.log(`[${new Date().toISOString()}] scan · origines=${config.origins.join(",")}`);
   await ensureCatalog();
   const subscribers = activeSubscribers();
+  const allEntries: PriceEntry[] = [];
   let candidates = 0;
   let posted = 0;
   let emailed = 0;
@@ -30,6 +33,7 @@ export async function runScan(): Promise<void> {
     console.log(`  ${origin}: ${entries.length} destinations`);
 
     for (const e of entries) {
+      allEntries.push(e);
       await recordPrice(routeKey(e), e.price);
 
       const deal = await evaluate(e);
@@ -65,7 +69,33 @@ export async function runScan(): Promise<void> {
     }
   }
 
+  // 3) vitrine du site : les moins chers, une carte par destination
+  const cheapestByDest = new Map<string, PriceEntry>();
+  for (const e of allEntries) {
+    const cur = cheapestByDest.get(e.destination);
+    if (cur === undefined || e.price < cur.price) cheapestByDest.set(e.destination, e);
+  }
+  const browse: DealRecord[] = [...cheapestByDest.values()]
+    .sort((a, b) => a.price - b.price)
+    .slice(0, 24)
+    .map((e) => ({
+      dealKey: dealKey(e),
+      origin: e.origin,
+      destination: e.destination,
+      originName: cityName(e.origin),
+      destinationName: cityName(e.destination),
+      price: e.price,
+      currency: e.currency,
+      airline: e.airline,
+      transfers: e.transfers,
+      region: regionOf(e.destination),
+      departureAt: e.departureAt,
+      returnAt: e.returnAt,
+      affiliateUrl: buildFlightLink(e),
+    }));
+  replaceBrowseDeals(browse);
+
   console.log(
-    `scan terminé · candidats=${candidates} · postés=${posted} · emails=${emailed} · abonnés=${subscribers.length}`,
+    `scan terminé · candidats=${candidates} · postés=${posted} · emails=${emailed} · abonnés=${subscribers.length} · vitrine=${browse.length}`,
   );
 }

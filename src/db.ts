@@ -1,6 +1,7 @@
 import Database from "better-sqlite3";
 import { mkdirSync } from "node:fs";
 import path from "node:path";
+import type { DealRecord } from "./types.js";
 
 // Même base que le site web (racine du repo /data)
 const DB_PATH = process.env.DB_PATH ?? path.join(process.cwd(), "data", "skyflydrop.db");
@@ -25,6 +26,22 @@ db.exec(`
     deal_key TEXT NOT NULL,
     sent_at TEXT NOT NULL,
     PRIMARY KEY (subscriber_id, deal_key)
+  );
+  CREATE TABLE IF NOT EXISTS deals (
+    deal_key TEXT PRIMARY KEY,
+    origin TEXT NOT NULL,
+    destination TEXT NOT NULL,
+    origin_name TEXT NOT NULL,
+    destination_name TEXT NOT NULL,
+    price INTEGER NOT NULL,
+    currency TEXT NOT NULL,
+    airline TEXT NOT NULL,
+    transfers INTEGER NOT NULL,
+    region TEXT NOT NULL,
+    departure_at TEXT NOT NULL,
+    return_at TEXT,
+    affiliate_url TEXT NOT NULL,
+    created_at TEXT NOT NULL
   );
 `);
 
@@ -76,4 +93,21 @@ export function markSent(subscriberId: number, dealKey: string): void {
   db.prepare(
     "INSERT OR IGNORE INTO sent_alerts (subscriber_id, deal_key, sent_at) VALUES (?, ?, ?)",
   ).run(subscriberId, dealKey, new Date().toISOString());
+}
+
+/** Remplace la vitrine du site par les deals fournis (les moins chers). */
+export function replaceBrowseDeals(records: DealRecord[]): void {
+  const now = new Date().toISOString();
+  const insert = db.prepare(
+    `INSERT OR REPLACE INTO deals
+     (deal_key, origin, destination, origin_name, destination_name, price, currency,
+      airline, transfers, region, departure_at, return_at, affiliate_url, created_at)
+     VALUES (@dealKey, @origin, @destination, @originName, @destinationName, @price, @currency,
+      @airline, @transfers, @region, @departureAt, @returnAt, @affiliateUrl, @createdAt)`,
+  );
+  const tx = db.transaction((recs: DealRecord[]) => {
+    db.prepare("DELETE FROM deals").run();
+    for (const r of recs) insert.run({ ...r, createdAt: now });
+  });
+  tx(records);
 }
