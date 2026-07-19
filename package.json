@@ -1,0 +1,23 @@
+{
+  "name": "skyflydrop",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Détecteur de deals de vols -> poste automatiquement sur Telegram avec liens affiliés Travelpayouts",
+  "scripts": {
+    "scan": "tsx src/index.ts --once",
+    "start": "tsx src/index.ts",
+    "dev": "tsx watch src/index.ts --once",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "node-cron": "^3.0.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "@types/node-cron": "^3.0.11",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}

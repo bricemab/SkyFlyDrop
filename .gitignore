@@ -1,0 +1,14 @@
+node_modules/
+dist/
+.env
+data/store.json
+
+# secrets / clés — NE JAMAIS committer
+bricemab_*
+*.pem
+*.key
+*.pub
+*_key
+id_rsa*
+id_ed25519*
+*.ppk
